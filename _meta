@@ -1,0 +1,10 @@
+<package project="Mer:Trunk:Base" name="filesystem">
+  <title>The basic directory layout for a Linux system</title>
+  <description>The filesystem package is one of the basic packages that is installed
+on a Linux system. Filesystem contains the basic directory layout
+for a Linux operating system, including the correct permissions for
+the directories.
+
+</description>
+  <url>https://fedorahosted.org/filesystem</url>
+</package>

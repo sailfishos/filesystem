@@ -1,0 +1,38 @@
+* Fri May 27 2011 Anas Nashif <anas.nashif@intel.com> - 2.4.31
+- Disable auto-doc generation
+
+* Thu Jan 27 2011 Marko Saukko <marko.saukko@cybercom.com> - 2.4.31
+- Added noarch (BMC#12869)
+
+* Mon Dec 20 2010 Anas Nashif <nashif@linux.intel.com> - 2.4.31
+- Fixed syntax for new RPM (bmc #11563)
+
+* Thu Nov 25 2010 Vivian Zhang <vivian.zhang@intel.com> - 2.4.31
+- Correct the erroneous directory /var/lib/{misc} (BMC #9966) 
+
+* Wed Jul 14 2010 Yan Yin <yan.yin@intel.com> - 2.4.31
+- Add /etc/rc.d/init.d dir and link /etc/init.d
+
+* Wed Jan 27 2010 Peter J Zhu <peter.j.zhu@intel.com> - 2.4.31
+- remove selinux
+
+* Wed Jan 27 2010 Peter J Zhu <peter.j.zhu@intel.com> - 2.4.31
+- Update to 2.4.31
+
+* Tue Jun 30 2009 Arjan van de Ven <arjan@linux.intel.com> 2.4.13
+- add /var/cache/nbtk directory
+
+* Thu Mar 12 2009 Arjan van de Ven <arjan@linux.intel.com> 2.4.13
+- add /dev/tty* dev nodes
+
+* Sat Feb 21 2009 Arjan van de Ven <arjan@linux.intel.com> 2.4.13
+- Add /dev/fb0
+
+* Mon Feb  9 2009 Yin Kangkai <kangkai.yin@intel.com> 2.4.13
+- Add URL in spec file
+
+* Thu Dec 25 2008 Arjan van de Ven <arjan@linux.intel.com> 2.4.13
+- Package a /dev/console so that we can always boot
+
+* Sat Nov 29 2008 Anas Nashif <anas.nashif@intel.com> 2.4.13
+- Remove selinux from file system
