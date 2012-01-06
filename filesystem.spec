@@ -127,9 +127,9 @@ rm -rf %{buildroot}
 %attr(555,root,root) /usr/bin
 /usr/games
 /usr/include
-%attr(555,root,root) /usr/lib
+/usr/lib
 %ifarch x86_64 ppc ppc64 sparc sparc64 s390 s390x
-%attr(555,root,root) /usr/%{_lib}
+/usr/%{_lib}
 %endif
 /usr/libexec
 /usr/local
@@ -179,8 +179,3 @@ rm -rf %{buildroot}
 %attr(775,root,mail) /var/spool/mail
 %attr(1777,root,root) /var/tmp
 /var/yp
-%dev(c,5,1) /dev/console
-%dev(c,29,0) /dev/fb0
-%dev(c,4,0) /dev/tty
-%dev(c,4,1) /dev/tty1
-%dev(c,4,2) /dev/tty2
