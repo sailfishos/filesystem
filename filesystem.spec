@@ -104,27 +104,27 @@ rm -rf %{buildroot}
 
 %files -f filelist
 %defattr(0755,root,root,-)
-%dir %attr(555,root,root) /
-%attr(555,root,root) /bin
-%attr(555,root,root) /boot
+/
+/bin
+/boot
 /dev
 /etc
 /home
-%attr(555,root,root) /lib
+/lib
 %ifarch x86_64 ppc ppc64 sparc sparc64 s390 s390x
-%attr(555,root,root) /%{_lib}
+/%{_lib}
 %endif
 /media
 %dir /mnt
 %dir /opt
-%attr(555,root,root) /proc
-%attr(550,root,root) /root
-%attr(555,root,root) /sbin
+/proc
+%attr(750,root,root) /root
+/sbin
 /srv
 /sys
 %attr(1777,root,root) /tmp
 %dir /usr
-%attr(555,root,root) /usr/bin
+/usr/bin
 /usr/games
 /usr/include
 /usr/lib
@@ -133,7 +133,7 @@ rm -rf %{buildroot}
 %endif
 /usr/libexec
 /usr/local
-%attr(555,root,root) /usr/sbin
+/usr/sbin
 %dir /usr/share
 /usr/share/applications
 /usr/share/augeas
@@ -141,7 +141,7 @@ rm -rf %{buildroot}
 /usr/share/desktop-directories
 /usr/share/dict
 /usr/share/doc
-%attr(555,root,root) %dir /usr/share/empty
+%dir /usr/share/empty
 /usr/share/games
 /usr/share/ghostscript
 /usr/share/gnome

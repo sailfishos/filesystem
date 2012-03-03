@@ -1,3 +1,6 @@
+* Sat Mar 03 2012 Carsten Munk <carsten@merproject.org> - 2.4.31
+- Relax 555 -> 755 permissions for SB2-OBS
+
 * Fri Jan 06 2012 Carsten Munk <carsten@maemo.org> - 2.4.31
 - Remove device nodes from filesystem package, relax permissions needed
   in order to have SB2-OBS work properly.
