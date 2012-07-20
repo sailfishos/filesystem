@@ -1,7 +1,6 @@
-%define disable_docs_package 1
 Summary: The basic directory layout for a Linux system
 Name: filesystem
-Version: 2.4.31
+Version: 3.1
 Release: 1
 License: Public Domain
 URL: https://fedorahosted.org/filesystem
@@ -14,6 +13,8 @@ Source2: iso_639.sed
 Source3: iso_3166.sed
 Requires(pre): setup >= 2.5.4-1
 BuildRequires: iso-codes
+# The /run got moved in systemd 187 to this package, thus conflicts with older ones.
+Conflicts: systemd < 187
 
 %description
 The filesystem package is one of the basic packages that is installed
@@ -34,15 +35,15 @@ install -p -c -m755 %SOURCE3 %{buildroot}/iso_3166.sed
 
 cd %{buildroot}
 
-mkdir -p bin boot dev \
-        etc/{X11/{applnk,fontpath.d},xdg/autostart,opt,pm/{config.d,power.d,sleep.d},xinetd.d,skel,sysconfig,pki,rc.d/init.d} \
-        home lib/modules %{_lib}/tls media mnt opt proc root sbin srv sys tmp \
-        usr/{bin,games,include,%{_lib}/{games,sse2,tls,X11,pm-utils/{module.d,power.d,sleep.d}},lib/{games,locale},libexec,local/{bin,games,lib,%{_lib},sbin,src,libexec,include,},sbin,share/{applications,augeas/lenses,backgrounds,desktop-directories,dict,doc,empty,games,ghostscript/conf.d,gnome,icons,idl,info,man/man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x,0p,1p,3p},mime-info,misc,omf,pixmaps,sounds,themes,xsessions,X11},src,src/kernels,src/debug} \
-        var/{lib/misc,local,lock/subsys,log,nis,preserve,run,spool/{mail,lpd},tmp,db,cache,opt,games,yp} 
+mkdir -p boot dev \
+        bin lib sbin \
+        etc/{X11/{applnk,fontpath.d},xdg/autostart,opt,pm/{config.d,power.d,sleep.d},xinetd.d,skel,sysconfig,pki} \
+        home media mnt opt proc root run/lock srv sys tmp \
+        usr/{bin,etc,games,include,%{_lib}/{games,sse2,tls,X11,pm-utils/{module.d,power.d,sleep.d}},lib/{games,locale,modules,sse2},libexec,local/{bin,etc,games,lib,%{_lib},sbin,src,share/{applications,man/man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x},info},libexec,include,},sbin,share/{aclocal,applications,augeas/lenses,backgrounds,desktop-directories,dict,doc,empty,games,ghostscript/conf.d,gnome,icons,idl,info,man/man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x,0p,1p,3p},mime-info,misc,omf,pixmaps,sounds,themes,xsessions,X11},src,src/kernels,src/debug} \
+        var/{adm,empty,gopher,lib/{games,misc,rpm-state},local,lock/subsys,log,nis,preserve,run,spool/{mail,lpd,uucp},tmp,db,cache,opt,games,yp}
 
 ln -snf ../var/tmp usr/tmp
 ln -snf spool/mail var/mail
-ln -snf rc.d/init.d etc/init.d
 
 sed -n -f %{buildroot}/iso_639.sed /usr/share/xml/iso-codes/iso_639.xml \
   >%{buildroot}/iso_639.tab
@@ -64,9 +65,9 @@ cat %{SOURCE1} | grep -v "^#" | grep -v "^$" | while read loc ; do
     locale=$loc
     locality=
     special=
-    [[ "$locale" =~ "@" ]] && locale=${locale%%@*}
+    [[ "$locale" =~ "@" ]] && locale=${locale%%%%@*}
     [[ "$locale" =~ "_" ]] && locality=${locale##*_}
-    [[ "$locality" =~ "." ]] && locality=${locality%%.*}
+    [[ "$locality" =~ "." ]] && locality=${locality%%%%.*}
     [[ "$loc" =~ "_" ]] || [[ "$loc" =~ "@" ]] || special=$loc
 
     # If the locality is not official, skip it
@@ -75,7 +76,7 @@ cat %{SOURCE1} | grep -v "^#" | grep -v "^$" | while read loc ; do
     fi
     # If the locale is not official and not special, skip it
     if [ -z "$special" ]; then
-        egrep -q "[[:space:]]${locale%_*}[[:space:]]" \
+        egrep -q "[[:space:]]${locale%%_*}[[:space:]]" \
            %{buildroot}/iso_639.tab || continue
     fi
     echo "%lang(${locale})	/usr/share/locale/${loc}" >> $RPM_BUILD_DIR/filelist
@@ -95,20 +96,26 @@ cat $RPM_BUILD_DIR/filelist | grep "/share/man" | while read a b c d; do
     mkdir -p -m 755 %{buildroot}/$d/man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x,0p,1p,3p}
 done
 
-for i in `echo man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x,0p,1p,3p}`; do
+for i in man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x,0p,1p,3p}; do
    echo "/usr/share/man/$i" >>$RPM_BUILD_DIR/filelist
 done
 
-%clean
-rm -rf %{buildroot}
-
 %files -f filelist
+%exclude /documentation.list 
 %defattr(0755,root,root,-)
 /
 /bin
 /boot
 /dev
-/etc
+%dir /etc
+/etc/X11
+/etc/xdg
+/etc/opt
+/etc/pm
+/etc/xinetd.d
+/etc/skel
+/etc/sysconfig
+/etc/pki
 /home
 /lib
 %ifarch x86_64 ppc ppc64 sparc sparc64 s390 s390x
@@ -119,12 +126,14 @@ rm -rf %{buildroot}
 %dir /opt
 /proc
 %attr(750,root,root) /root
+/run
 /sbin
 /srv
 /sys
 %attr(1777,root,root) /tmp
 %dir /usr
 /usr/bin
+/usr/etc
 /usr/games
 /usr/include
 /usr/lib
@@ -135,6 +144,7 @@ rm -rf %{buildroot}
 /usr/local
 /usr/sbin
 %dir /usr/share
+/usr/share/aclocal
 /usr/share/applications
 /usr/share/augeas
 /usr/share/backgrounds
@@ -161,21 +171,26 @@ rm -rf %{buildroot}
 /usr/src
 /usr/tmp
 %dir /var
+/var/adm
+/var/cache
 /var/db
+/var/empty
 /var/games
+/var/gopher
 /var/lib
 /var/local
-%dir %attr(0775,root,lock) /var/lock
-%attr(755,root,root) /var/lock/subsys
-/var/cache
+%ghost %dir %attr(755,root,root) /var/lock
+%ghost /var/lock/subsys
 /var/log
 /var/mail
 /var/nis
 /var/opt
 /var/preserve
-/var/run
+%ghost %attr(755,root,root) /var/run
 %dir /var/spool
 %attr(755,root,root) /var/spool/lpd
 %attr(775,root,mail) /var/spool/mail
+%attr(755,uucp,uucp) /var/spool/uucp
 %attr(1777,root,root) /var/tmp
 /var/yp
+
