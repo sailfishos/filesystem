@@ -100,6 +100,10 @@ for i in man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x,0p,1p,3p}; do
    echo "/usr/share/man/$i" >>$RPM_BUILD_DIR/filelist
 done
 
+%post -p <lua>
+posix.symlink("../run", "/var/run")
+posix.symlink("../run/lock", "/var/lock")
+
 %files -f filelist
 %exclude /documentation.list 
 %defattr(0755,root,root,-)
