@@ -1,6 +1,6 @@
 Summary: The basic directory layout for a Linux system
 Name: filesystem
-Version: 3.1+git2
+Version: 3.1+git3
 Release: 1
 License: Public Domain
 URL: https://fedorahosted.org/filesystem
@@ -103,6 +103,155 @@ done
 %post -p <lua>
 posix.symlink("../run", "/var/run")
 posix.symlink("../run/lock", "/var/lock")
+
+
+%posttrans -p <lua>
+-- Perform the lib64 migration if some packages are installing to
+-- /lib. 
+
+-- our lua doesn't have this function builtin yet
+-- from https://github.com/stevedonovan/Penlight/blob/master/lua/pl/path.lua#L279
+--- normalize a path name.
+--  `A//B`, `A/./B`, and `A/foo/../B` all become `A/B`.
+-- @string P a file path
+function normpath(P)
+    local append, concat, remove = table.insert, table.concat, table.remove
+    -- Split path into anchor and relative path.
+    local anchor = ''
+    local sep = '/'
+    -- According to POSIX, in path start '//' and '/' are distinct,
+    -- but '///+' is equivalent to '/'.
+    -- We dont care.
+    if P:sub(1,1) == '/' then
+        anchor = '/'
+        P = P:match '^/*(.*)$'
+    end
+
+    local parts = {}
+    for part in P:gmatch('[^'..sep..']+') do
+        if part == '..' then
+            if #parts ~= 0 and parts[#parts] ~= '..' then
+                remove(parts)
+            else
+                append(parts, part)
+            end
+        elseif part ~= '.' then
+            append(parts, part)
+        end
+    end
+    P = anchor..concat(parts, sep)
+    if P == '' then P = '.' end
+    return P
+end
+
+local function movedir(src, dest)
+  -- move src/* dest/
+
+  -- TODO: Check if src/dest are symlinks to each other and abort if needed
+--  os.execute('echo '..src..';ls -laF '..src..'/')
+--  os.execute('echo '..dest..';ls -laF '..dest..'/')
+  local files = posix.dir(src)
+  table.sort(files)
+  for i,f in ipairs(files) do
+    local sf = src..'/'..f
+    local df = dest..'/'..f
+    print('looking at '..sf)
+    if f ~= '.' and f ~= '..' then
+      local dinfo = posix.stat(df)
+      local info = posix.stat(sf)
+
+      if dinfo ~= nil then -- there is something there already...
+	 print('WARNING - '..df..' already exists...')
+	 if dinfo.type == 'link' then
+	    -- # There's a symlink in the way
+	    -- If the dest file is a symlink to the src then remove the dest so the src will replace it
+	    local dlink_target = posix.readlink(df)
+	    if dlink_target:sub(1,1) ~= '/' then -- relative file so normalise based on cwd=/dest
+	       dlink_target = dest..'/'..dlink_target
+	    end
+	    local real_dtarget = normpath(dlink_target)
+--            print(df..' links to '..dlink_target..' which points to '..real_dtarget)
+
+	    -- is the src a link?
+	    local real_src=""
+	    if info.type == 'link' then
+               local link_target = posix.readlink(sf)
+	       if link_target:sub(1,1) ~= '/' then -- relative file so normalise based on cwd=/src
+		  link_target = src..'/'..link_target
+	       end
+	       real_src = normpath(link_target)
+--	       print(sf..' -> '..real_src)
+	    end
+	    -- why?
+	    -- because /usr/bin/awk links to /usr/bin/../../bin/gawk
+	    -- and /bin/awk points to /bin/gawk ... so the complete comparison is needed.
+	    if real_dtarget==sf or real_dtarget==real_src then -- # remove the symlink
+--               print('which is the src. So removing dest: '..df)
+	       posix.unlink(df)
+            else
+		print('which is not the src so removing src: '..sf)
+		posix.unlink(sf)
+	    end
+	 elseif dinfo.type == 'directory' then
+            if info.type == 'directory' then
+	       -- need to move all the files in sf/ to df/ in a bit
+	    else
+               print(' WARNING : '..df..' exists and is a directory but '..sf..' is a '..info.type..' Removing src')
+              posix.unlink(sf)
+	    end
+         else
+            print(' WARNING : '..df..' exists and is a '..dinfo.type..' file. Ignoring src.')
+            posix.unlink(sf)
+	 end
+      end
+      info = posix.stat(sf)
+      if info == nil then
+--	 print(sf..' removed')
+      elseif info.type == 'link' then
+         local link_target = posix.readlink(sf)
+	 -- TODO: check if the symlink is relative and fix
+         print(' - sym linking '..df..' -> '..link_target)
+  	 posix.symlink(link_target, df)
+         posix.unlink(sf)
+      elseif info.type == 'directory' and dinfo ~= nil and dinfo.type == 'directory' then
+        print(sf..' and '..df..' are directories... recursing')
+	movedir(sf, df)
+      elseif info.type == 'directory' or info.type == 'regular' then
+        print(' - moving')
+        os.rename(src..'/'..f, dest..'/'..f)
+      else -- character, block, fifo, socket
+	print(' - is a '..info.type.." file and can't be handled")
+      end
+    end
+  end
+  print('remove '..src)
+  ret,errmsg = posix.rmdir(src)
+  assert(ret == 0, errmsg)
+end
+  
+local function link_moved_dir(src, dest)
+
+  movedir(src,dest)
+  print('ls -laF /\n')
+  os.execute('ls -laF /')
+  os.execute('echo '..src..';ls -laF '..src..'/')
+  print('linking '..src..' to '..dest)
+  ret,errmsg = posix.symlink(dest, src)
+  assert(ret == 0, errmsg)
+  os.execute('echo /;ls -laF /')
+  os.execute('echo '..dst..';ls -laF '..dst..'/')
+  return true
+end
+
+-- turn off buffering so we see os.execute in the right place
+io.stdout:setvbuf 'no'
+
+-- print('Moving lib to lib64')
+link_moved_dir('lib', 'lib64')
+
+-- print('Execute ldconfig')
+os.execute('ldconfig')
+-- print('All done')
 
 %files -f filelist
 %exclude /documentation.list 
