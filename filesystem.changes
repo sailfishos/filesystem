@@ -1,3 +1,6 @@
+* Tue Jan 16 2020 Franz-Josef Haider <franz.haider@jollamobile.com> - 3.1+git1
+- [filesystem] make sure boot is only readable by root. JB#46551
+
 * Tue Jul 24 2012 Marko Saukko <marko.saukko@jollamobile.com> - 3.1
 - %post for /run and /run/lock
 
