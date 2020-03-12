@@ -1,3 +1,6 @@
+* Thu Mar 12 2020 Matti Kosola <matti.kosola@jolla.com> - 3.1+git2
+- Remove /var/spool/uucp and uucp user/group usage. Fixes JB#49323
+
 * Tue Jan 16 2020 Franz-Josef Haider <franz.haider@jollamobile.com> - 3.1+git1
 - [filesystem] make sure boot is only readable by root. JB#46551
 
