@@ -252,12 +252,12 @@ end
 -- turn off buffering so we see os.execute in the right place
 io.stdout:setvbuf 'no'
 
--- print('Moving lib to lib64')
+print('filesystem posttrans: Moving lib to lib64 (arch = %_obs_port_arch or %_arch)')
 link_moved_dir('lib', 'lib64')
 
--- print('Execute ldconfig')
+print('Execute ldconfig')
 os.execute('ldconfig')
--- print('All done')
+print('filesystem posttrans: All done')
 %endif ## aarch64
 
 %files -f filelist
