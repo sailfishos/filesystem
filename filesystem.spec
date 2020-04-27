@@ -237,17 +237,31 @@ end
   
 local function link_moved_dir(src, dest)
 
-  movedir(src,dest)
   print('ls -laF /\n')
   os.execute('ls -laF /')
-  os.execute('echo '..src..';ls -laF '..src..'/')
+  print('ls -laFR '..src..'/\n')
+  os.execute('ls -laFR '..src..'/')
+  print('ls -laFR '..dest..'/\n')
+  os.execute('ls -laFR '..dest..'/')
+
+  print('moving '..src..' to '..dest)
+  movedir(src, dest)
+
+  print('ls -laF /\n')
+  os.execute('ls -laF /')
+  print('ls -laFR '..dest..'/\n')
+  os.execute('ls -laFR '..dest..'/')
+
   print('linking '..src..' to '..dest)
   ret,errmsg = posix.symlink(dest, src)
   assert(ret == 0, errmsg)
-  os.execute('echo /;ls -laF /')
-  os.execute('echo '..dst..';ls -laF '..dst..'/')
+  print('ls -laF /\n')
+  os.execute('ls -laF /')
   return true
 end
+
+---------------------------------------------
+-- Execution starts here
 
 -- turn off buffering so we see os.execute in the right place
 io.stdout:setvbuf 'no'
