@@ -104,7 +104,7 @@ done
 posix.symlink("../run", "/var/run")
 posix.symlink("../run/lock", "/var/lock")
 
-
+%ifarch aarch64
 %posttrans -p <lua>
 -- Perform the lib64 migration if some packages are installing to
 -- /lib. 
@@ -252,6 +252,7 @@ link_moved_dir('lib', 'lib64')
 -- print('Execute ldconfig')
 os.execute('ldconfig')
 -- print('All done')
+%endif ## aarch64
 
 %files -f filelist
 %exclude /documentation.list 
