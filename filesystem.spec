@@ -224,6 +224,12 @@ local function movedir(src, dest)
       end
     end
   end
+  print('files in '..src)
+  local files = posix.dir(src)
+  table.sort(files)
+  for i,f in ipairs(files) do
+    print(src.."/"..f)
+  end
   print('remove '..src)
   ret,errmsg = posix.rmdir(src)
   assert(ret == 0, errmsg)
