@@ -107,7 +107,7 @@ posix.symlink("../run/lock", "/var/lock")
 %if "%_arch" == "aarch64"
 %posttrans -p <lua>
 -- Perform the lib64 migration if some packages are installing to
--- /lib. 
+-- /lib.
 
 -- our lua doesn't have this function builtin yet
 -- from https://github.com/stevedonovan/Penlight/blob/master/lua/pl/path.lua#L279
