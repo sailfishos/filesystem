@@ -237,7 +237,7 @@ local function movedir(src, dest)
   assert(ret == 0, errmsg)
 end
   
-local function link_moved_dir(src, dest)
+local function movedir_debug(src, dest)
 
   print('Checking files in /'..src..' and /'..dest..' before and after doing the move')
   print('ls -laF /\n')
@@ -254,12 +254,16 @@ local function link_moved_dir(src, dest)
   os.execute('ls -laF /')
   print('ls -laFR '..dest..'/\n')
   os.execute('ls -laFR '..dest..'/')
+end
 
+local function ldconfig()
   -- do this before the /lib symlink is made so the cache doesn't hav things in /lib
   print('Execute ldconfig and checking strings in /etc/ld.so.cache')
   os.execute('ldconfig')
   os.execute('ldconfig -p')
+end
 
+local function do_links(src, dest)
   print('linking '..src..' to '..dest)
   ret,errmsg = posix.symlink(dest, src)
   assert(ret == 0, errmsg)
@@ -275,7 +279,12 @@ end
 io.stdout:setvbuf 'no'
 
 print('filesystem posttrans: Moving lib to lib64 (arch = %_obs_port_arch or %_arch)')
-link_moved_dir('lib', 'lib64')
+
+movedir_debug('lib', 'lib64')
+movedir_debug('usr/lib', 'usr/lib64')
+ldconfig()
+do_links('lib', 'lib64')
+do_links('usr/lib', 'usr/lib64')
 
 print('filesystem posttrans: All done')
 %endif ## aarch64
