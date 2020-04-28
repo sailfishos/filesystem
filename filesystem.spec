@@ -104,6 +104,8 @@ done
 posix.symlink("../run", "/var/run")
 posix.symlink("../run/lock", "/var/lock")
 
+-- comments here are still part of the lua script hence --, # is an error :/
+-- # the ifarch macro looks at the BuildArch which is noarch for this package
 %if "%_arch" == "aarch64"
 %posttrans -p <lua>
 -- Perform the lib64 migration if some packages are installing to
@@ -155,7 +157,7 @@ local function movedir(src, dest)
   for i,f in ipairs(files) do
     local sf = src..'/'..f
     local df = dest..'/'..f
-    print('looking at '..sf)
+    -- print('looking at '..sf)
     if f ~= '.' and f ~= '..' then
       local dinfo = posix.stat(df)
       local info = posix.stat(sf)
@@ -210,33 +212,34 @@ local function movedir(src, dest)
       elseif info.type == 'link' then
          local link_target = posix.readlink(sf)
 	 -- TODO: check if the symlink is relative and fix
-         print(' - sym linking '..df..' -> '..link_target)
+--         print(' - sym linking '..df..' -> '..link_target)
   	 posix.symlink(link_target, df)
          posix.unlink(sf)
       elseif info.type == 'directory' and dinfo ~= nil and dinfo.type == 'directory' then
-        print(sf..' and '..df..' are directories... recursing')
+--        print(sf..' and '..df..' are directories... recursing')
 	movedir(sf, df)
       elseif info.type == 'directory' or info.type == 'regular' then
-        print(' - moving')
+--        print(' - moving')
         os.rename(src..'/'..f, dest..'/'..f)
       else -- character, block, fifo, socket
 	print(' - is a '..info.type.." file and can't be handled")
       end
     end
   end
-  print('files in '..src)
-  local files = posix.dir(src)
-  table.sort(files)
-  for i,f in ipairs(files) do
-    print(src.."/"..f)
-  end
-  print('remove '..src)
+--  print('files still in '..src)
+--  local files = posix.dir(src)
+--  table.sort(files)
+--  for i,f in ipairs(files) do
+--    print(src.."/"..f)
+--  end
+--  print('remove '..src)
   ret,errmsg = posix.rmdir(src)
   assert(ret == 0, errmsg)
 end
   
 local function link_moved_dir(src, dest)
 
+  print('Checking files in /'..src..' and /'..dest..' before and after doing the move')
   print('ls -laF /\n')
   os.execute('ls -laF /')
   print('ls -laFR '..src..'/\n')
@@ -269,8 +272,11 @@ io.stdout:setvbuf 'no'
 print('filesystem posttrans: Moving lib to lib64 (arch = %_obs_port_arch or %_arch)')
 link_moved_dir('lib', 'lib64')
 
-print('Execute ldconfig')
+print('Execute ldconfig and checking strings in /etc/ld.so.cache')
+
 os.execute('ldconfig')
+os.execute('strings -n5 /etc/ld.so.cache')
+
 print('filesystem posttrans: All done')
 %endif ## aarch64
 
