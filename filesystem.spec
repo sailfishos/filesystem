@@ -255,6 +255,11 @@ local function link_moved_dir(src, dest)
   print('ls -laFR '..dest..'/\n')
   os.execute('ls -laFR '..dest..'/')
 
+  -- do this before the /lib symlink is made so the cache doesn't hav things in /lib
+  print('Execute ldconfig and checking strings in /etc/ld.so.cache')
+  os.execute('ldconfig')
+  os.execute('ldconfig -p')
+
   print('linking '..src..' to '..dest)
   ret,errmsg = posix.symlink(dest, src)
   assert(ret == 0, errmsg)
@@ -271,11 +276,6 @@ io.stdout:setvbuf 'no'
 
 print('filesystem posttrans: Moving lib to lib64 (arch = %_obs_port_arch or %_arch)')
 link_moved_dir('lib', 'lib64')
-
-print('Execute ldconfig and checking strings in /etc/ld.so.cache')
-
-os.execute('ldconfig')
-os.execute('strings -n5 /etc/ld.so.cache')
 
 print('filesystem posttrans: All done')
 %endif ## aarch64
