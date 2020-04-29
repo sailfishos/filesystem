@@ -146,7 +146,7 @@ function normpath(P)
     return P
 end
 
-local function movedir(src, dest)
+local function movedir(src, dest, recurse)
   -- move src/* dest/
 
   -- TODO: Check if src/dest are symlinks to each other and abort if needed
@@ -217,10 +217,14 @@ local function movedir(src, dest)
          posix.unlink(sf)
       elseif info.type == 'directory' and dinfo ~= nil and dinfo.type == 'directory' then
 --        print(sf..' and '..df..' are directories... recursing')
-	movedir(sf, df)
+          if recurse then
+             movedir(sf, df, recurse)
+	  end
       elseif info.type == 'directory' or info.type == 'regular' then
 --        print(' - moving')
-        os.rename(src..'/'..f, dest..'/'..f)
+        if recurse then
+          os.rename(src..'/'..f, dest..'/'..f)
+	end
       else -- character, block, fifo, socket
 	print(' - is a '..info.type.." file and can't be handled")
       end
@@ -237,7 +241,7 @@ local function movedir(src, dest)
   assert(ret == 0, errmsg)
 end
   
-local function movedir_debug(src, dest)
+local function movedir_debug(src, dest, recurse)
 
   print('Checking files in /'..src..' and /'..dest..' before and after doing the move')
   print('ls -laF /\n')
@@ -248,7 +252,7 @@ local function movedir_debug(src, dest)
   os.execute('ls -laFR '..dest..'/')
 
   print('moving '..src..' to '..dest)
-  movedir(src, dest)
+  movedir(src, dest, recurse)
 
   print('ls -laF /\n')
   os.execute('ls -laF /')
@@ -280,8 +284,8 @@ io.stdout:setvbuf 'no'
 
 print('filesystem posttrans: Moving lib to lib64 (arch = %_obs_port_arch or %_arch)')
 
-movedir_debug('lib', 'lib64')
-movedir_debug('usr/lib', 'usr/lib64')
+movedir_debug('lib', 'lib64', true)
+movedir_debug('usr/lib', 'usr/lib64', true)
 ldconfig()
 do_links('lib', 'lib64')
 do_links('usr/lib', 'usr/lib64')
