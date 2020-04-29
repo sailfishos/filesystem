@@ -148,7 +148,7 @@ end
 
 local function movedir(src, dest, recurse)
   -- move src/* dest/
-
+  print('movedir '..src..' to '..dest..'('..((recurse) and ('') or ('no '))..'recurse)')
   -- TODO: Check if src/dest are symlinks to each other and abort if needed
 --  os.execute('echo '..src..';ls -laF '..src..'/')
 --  os.execute('echo '..dest..';ls -laF '..dest..'/')
@@ -230,14 +230,17 @@ local function movedir(src, dest, recurse)
       end
     end
   end
---  print('files still in '..src)
---  local files = posix.dir(src)
---  table.sort(files)
---  for i,f in ipairs(files) do
---    print(src.."/"..f)
---  end
---  print('remove '..src)
+  -- print('remove '..src)
   ret,errmsg = posix.rmdir(src)
+  if ret ~= 0 then
+    print('Error: files still in '..src)
+    local files = posix.dir(src)
+    table.sort(files)
+    for i,f in ipairs(files) do
+      print(src.."/"..f)
+    end
+    os.execute('ls -laFR '..src)
+  end
   assert(ret == 0, errmsg)
 end
   
