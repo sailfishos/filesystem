@@ -296,7 +296,7 @@ do_links('lib', 'lib64')
 print('ls -laF /\n')
 os.execute('ls -laF /')
 
-do_links('usr/lib', 'usr/lib64')
+do_links('usr/lib', 'lib64')
 print('ls -laF /usr\n')
 os.execute('ls -laF /usr')
 print('ls -laFR /usr/lib/rpm\n')
