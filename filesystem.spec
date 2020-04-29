@@ -254,6 +254,7 @@ local function movedir_debug(src, dest, recurse)
   print('ls -laFR '..dest..'/\n')
   os.execute('ls -laFR '..dest..'/')
 
+  print('################################################################\n\n')
   print('moving '..src..' to '..dest)
   movedir(src, dest, recurse)
 
@@ -274,8 +275,6 @@ local function do_links(src, dest)
   print('linking '..src..' to '..dest)
   ret,errmsg = posix.symlink(dest, src)
   assert(ret == 0, errmsg)
-  print('ls -laF /\n')
-  os.execute('ls -laF /')
   return true
 end
 
@@ -287,11 +286,21 @@ io.stdout:setvbuf 'no'
 
 print('filesystem posttrans: Moving lib to lib64 (arch = %_obs_port_arch or %_arch)')
 
+print('################################################################\n\n')
 movedir_debug('lib', 'lib64', true)
+print('################################################################\n\n')
 movedir_debug('usr/lib', 'usr/lib64', true)
+print('################################################################\n\n')
 ldconfig()
 do_links('lib', 'lib64')
+print('ls -laF /\n')
+os.execute('ls -laF /')
+
 do_links('usr/lib', 'usr/lib64')
+print('ls -laF /usr\n')
+os.execute('ls -laF /usr')
+print('ls -laFR /usr/lib/rpm\n')
+os.execute('ls -laFR /usr/lib/rpm')
 
 print('filesystem posttrans: All done')
 %endif ## aarch64
