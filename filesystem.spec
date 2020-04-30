@@ -110,6 +110,9 @@ install -D -m644 %SOURCE4 %{buildroot}/%{_sysconfdir}/ld.so.conf.d/aarch64.conf
 %post -p <lua>
 posix.symlink("../run", "/var/run")
 posix.symlink("../run/lock", "/var/lock")
+%if "%_arch" == "aarch64"
+os.execute('ldconfig')
+%endif
 
 %if "%_arch" == "aarch64"
 %posttrans -p <lua>
@@ -218,20 +221,7 @@ print('################################################################\n\n')
 %attr(775,root,mail) /var/spool/mail
 %attr(1777,root,root) /var/tmp
 /var/yp
-
 %if "%_arch" == "aarch64"
-%package ldconfig-aarch64
-Summary: Update the lib64 ldconfig.so config
-
-%description ldconfig-aarch64
-This package provides the ldconfig.so config to access the required
-libraries for that architecture
-
-%post ldconfig-aarch64
-/usr/sbin/ldconfig
-
-%files ldconfig-aarch64
-%defattr(-,root,root)
 %config %{_sysconfdir}/ld.so.conf.d/aarch64.conf
 %dir %{_sysconfdir}/ld.so.conf.d
 %endif ## aarch64
