@@ -1,3 +1,6 @@
+* Mon May 18 2020 Simonas Leleiva <simonas.leleiva@meramo.co.uk> - 3.1+git1.1
+- Fix /boot permissions for Platform SDK Targets. Fixes JB#49952
+
 * Tue Jan 16 2020 Franz-Josef Haider <franz.haider@jollamobile.com> - 3.1+git1
 - [filesystem] make sure boot is only readable by root. JB#46551
 

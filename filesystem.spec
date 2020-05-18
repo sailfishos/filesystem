@@ -1,6 +1,6 @@
 Summary: The basic directory layout for a Linux system
 Name: filesystem
-Version: 3.1+git1
+Version: 3.1+git1.1
 Release: 1
 License: Public Domain
 URL: https://fedorahosted.org/filesystem
@@ -109,7 +109,7 @@ posix.symlink("../run/lock", "/var/lock")
 %defattr(0755,root,root,-)
 /
 /bin
-%attr(600,root,root) /boot
+%attr(700,root,root) /boot
 /dev
 %dir /etc
 /etc/X11
