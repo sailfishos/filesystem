@@ -1,10 +1,9 @@
 Summary: The basic directory layout for a Linux system
 Name: filesystem
-Version: 3.1+git3
+Version: 3.1+git4
 Release: 1
 License: Public Domain
 URL: https://fedorahosted.org/filesystem
-Group: System/Base
 BuildArch: noarch
 Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root
 # Raw source1 URL: https://fedorahosted.org/filesystem/browser/lang-exceptions?format=raw
@@ -99,6 +98,14 @@ done
 for i in man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x,0p,1p,3p}; do
    echo "/usr/share/man/$i" >>$RPM_BUILD_DIR/filelist
 done
+
+# Temporary symlink for systemd unit dir as we are switching from
+# /lib/systemd/system to %%{_unitdir} which defaults to /usr/lib/systemd/system
+# This can be removed when no package installs to /lib/systemd/system anymore
+# Bug JB#49681
+mkdir -p usr/lib/systemd/system
+mkdir -p lib/systemd
+ln -snf usr/lib/systemd/system lib/systemd/system
 
 %post -p <lua>
 posix.symlink("../run", "/var/run")

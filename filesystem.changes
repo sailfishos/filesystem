@@ -1,3 +1,6 @@
+* Wed Jun 03 2020 Niels Breet <niels.breet@jolla.com> - 3.1+git4
+- Put temporary symlink in place for systemd units. Contributes JB#49681
+
 * Mon May 18 2020 Simonas Leleiva <simonas.leleiva@meramo.co.uk> - 3.1+git3
 - Fix /boot permissions for Platform SDK Targets. Fixes JB#49952
 
