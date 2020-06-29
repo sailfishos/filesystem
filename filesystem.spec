@@ -1,6 +1,6 @@
 Summary: The basic directory layout for a Linux system
 Name: filesystem
-Version: 3.1+git3
+Version: 3.1+git4
 Release: 1
 License: Public Domain
 URL: https://fedorahosted.org/filesystem
@@ -11,6 +11,7 @@ Buildroot: %{_tmppath}/%{name}-%{version}-%{release}-root
 Source1: https://fedorahosted.org/filesystem/browser/lang-exceptions
 Source2: iso_639.sed
 Source3: iso_3166.sed
+Source4: aarch64.ldconfig.conf
 Requires(pre): setup >= 2.5.4-1
 BuildRequires: iso-codes
 # The /run got moved in systemd 187 to this package, thus conflicts with older ones.
@@ -21,6 +22,7 @@ The filesystem package is one of the basic packages that is installed
 on a Linux system. Filesystem contains the basic directory layout
 for a Linux operating system, including the correct permissions for
 the directories.
+
 
 %prep
 rm -f $RPM_BUILD_DIR/filelist
@@ -100,9 +102,17 @@ for i in man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x,0p,1p,3p}; do
    echo "/usr/share/man/$i" >>$RPM_BUILD_DIR/filelist
 done
 
+%if "%_arch" == "aarch64"
+# Install the ldconfig
+install -D -m644 %SOURCE4 %{buildroot}/%{_sysconfdir}/ld.so.conf.d/aarch64.conf
+%endif ## aarch64
+
 %post -p <lua>
 posix.symlink("../run", "/var/run")
 posix.symlink("../run/lock", "/var/lock")
+%if "%_arch" == "aarch64"
+os.execute('ldconfig')
+%endif
 
 %files -f filelist
 %exclude /documentation.list 
@@ -196,4 +206,7 @@ posix.symlink("../run/lock", "/var/lock")
 %attr(775,root,mail) /var/spool/mail
 %attr(1777,root,root) /var/tmp
 /var/yp
-
+%if "%_arch" == "aarch64"
+%config %{_sysconfdir}/ld.so.conf.d/aarch64.conf
+%dir %{_sysconfdir}/ld.so.conf.d
+%endif ## aarch64
