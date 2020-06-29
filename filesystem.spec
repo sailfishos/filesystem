@@ -114,21 +114,6 @@ posix.symlink("../run/lock", "/var/lock")
 os.execute('ldconfig')
 %endif
 
-%if "%_arch" == "aarch64"
-%posttrans -p <lua>
--- turn off buffering so we see os.execute in the right place
-io.stdout:setvbuf 'no'
-
-print('\n\n################################################################')
-print('filesystem posttrans: checking ldconfig')
-os.execute('ls -laFR /etc/ld.so.conf.d')
-os.execute('ldconfig -p')
-print('filesystem posttrans: All done')
-print('################################################################\n\n')
-  
-%endif ## aarch64
- 
-
 %files -f filelist
 %exclude /documentation.list 
 %defattr(0755,root,root,-)
