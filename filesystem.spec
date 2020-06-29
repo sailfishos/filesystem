@@ -1,6 +1,6 @@
 Summary: The basic directory layout for a Linux system
 Name: filesystem
-Version: 3.1+git3
+Version: 3.1+git4
 Release: 1
 License: Public Domain
 URL: https://fedorahosted.org/filesystem
