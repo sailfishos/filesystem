@@ -1,6 +1,6 @@
 Summary: The basic directory layout for a Linux system
 Name: filesystem
-Version: 3.1+git4
+Version: 3.1+git5
 Release: 1
 License: Public Domain
 URL: https://fedorahosted.org/filesystem
@@ -143,7 +143,7 @@ os.execute('ldconfig')
 /run
 /sbin
 /srv
-/sys
+%attr(555,root,root) /sys
 %attr(1777,root,root) /tmp
 %dir /usr
 /usr/bin
