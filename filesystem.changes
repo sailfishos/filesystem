@@ -1,3 +1,6 @@
+* Tue Mar 09 2021 Martin Kampas <martin.kampas@jolla.com> - 3.1+git5
+- Use 0555 permissions for /sys. Fixes JB#53484
+
 * Mon Jun 29 2020 David Greaves <david.greaves@jolla.com> - 3.1+git4
 - Add ld.so.conf path entries for aarch64. Contributes JB#49744
 
