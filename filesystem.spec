@@ -40,6 +40,10 @@ install -p -c -m755 %SOURCE3 %{buildroot}/iso_3166.sed
 cd %{buildroot}
 
 mkdir -p afs boot dev \
+        bin lib sbin \
+%ifarch x86_64 ppc64 sparc64 s390x aarch64 ppc64le mips64 mips64el riscv64
+        %{_lib} \
+%endif
         etc/{X11/{applnk,fontpath.d,xinit/{xinitrc,xinput}.d},xdg/autostart,opt,pm/{config.d,power.d,sleep.d},skel,sysconfig,pki,bash_completion.d,rwtab.d,statetab.d} \
         home media mnt opt root run srv tmp \
         usr/{bin,games,include,%{_lib}/{bpf,games,X11,pm-utils/{module.d,power.d,sleep.d}},lib/{debug/{.dwz,usr},games,locale,modules,sysimage},libexec,local/{bin,etc,games,lib,%{_lib}/bpf,sbin,src,share/{applications,man/man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x},info},libexec,include,},sbin,share/{aclocal,appdata,applications,augeas/lenses,backgrounds,bash-completion{,/completions,/helpers},desktop-directories,dict,doc,empty,games,gnome,help,icons,idl,info,licenses,man/man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x,0p,1p,3p},metainfo,mime-info,misc,omf,pixmaps,sounds,themes,xsessions,X11,wayland-sessions},src,src/kernels,src/debug} \
@@ -49,10 +53,10 @@ mkdir -p afs boot dev \
 #ln -snf etc/sysconfig etc/default
 ln -snf ../var/tmp usr/tmp
 ln -snf spool/mail var/mail
-ln -snf usr/bin bin
-ln -snf usr/sbin sbin
-ln -snf usr/lib lib
-ln -snf usr/%{_lib} %{_lib}
+#ln -snf usr/bin bin
+#ln -snf usr/sbin sbin
+#ln -snf usr/lib lib
+#ln -snf usr/%{_lib} %{_lib}
 ln -snf ../run var/run
 ln -snf ../run/lock var/lock
 ln -snf usr/bin usr/lib/debug/bin
@@ -144,15 +148,15 @@ posix.mkdir("/usr/lib/debug/usr/sbin")
 posix.mkdir("/usr/lib/debug/usr/lib")
 posix.mkdir("/usr/lib/debug/usr/%{_lib}")
 posix.mkdir("/usr/%{_lib}")
-posix.symlink("usr/bin", "/bin")
-posix.symlink("usr/sbin", "/sbin")
-posix.symlink("usr/lib", "/lib")
+--#posix.symlink("usr/bin", "/bin")
+--#posix.symlink("usr/sbin", "/sbin")
+--#posix.symlink("usr/lib", "/lib")
 posix.symlink("usr/bin", "/usr/lib/debug/bin")
 posix.symlink("usr/lib", "/usr/lib/debug/lib")
 posix.symlink("usr/%{_lib}", "/usr/lib/debug/%{_lib}")
 posix.symlink("../.dwz", "/usr/lib/debug/usr/.dwz")
 posix.symlink("usr/sbin", "/usr/lib/debug/sbin")
-posix.symlink("usr/%{_lib}", "/%{_lib}")
+--#posix.symlink("usr/%{_lib}", "/%{_lib}")
 posix.mkdir("/run")
 posix.mkdir("/proc")
 posix.mkdir("/sys")
@@ -172,15 +176,16 @@ return 0
 
 %posttrans
 #we need to restorecon on some dirs created in %pretrans or by other packages
-restorecon /var 2>/dev/null >/dev/null || :
-restorecon /var/run 2>/dev/null >/dev/null || :
-restorecon /var/lock 2>/dev/null >/dev/null || :
-restorecon -r /usr/lib/debug/ 2>/dev/null >/dev/null || :
-restorecon /sys 2>/dev/null >/dev/null || :
-restorecon /boot 2>/dev/null >/dev/null || :
-restorecon /dev 2>/dev/null >/dev/null || :
-restorecon /media 2>/dev/null >/dev/null || :
-restorecon /afs 2>/dev/null >/dev/null || :
+#no selnux in Sailfish OS base installation
+#restorecon /var 2>/dev/null >/dev/null || :
+#restorecon /var/run 2>/dev/null >/dev/null || :
+#restorecon /var/lock 2>/dev/null >/dev/null || :
+#restorecon -r /usr/lib/debug/ 2>/dev/null >/dev/null || :
+#restorecon /sys 2>/dev/null >/dev/null || :
+#restorecon /boot 2>/dev/null >/dev/null || :
+#restorecon /dev 2>/dev/null >/dev/null || :
+#restorecon /media 2>/dev/null >/dev/null || :
+#restorecon /afs 2>/dev/null >/dev/null || :
 
 %files content
 %dir %{_datadir}/filesystem
