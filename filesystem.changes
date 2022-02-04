@@ -1,3 +1,6 @@
+* Wed 02 Feb 2022 Matti Kosola <matti.kosola@jolla.com> - 3.16+git1
+- Sync with Fedora 3.16 version. Fixes JB#57301
+
 * Tue Mar 09 2021 Martin Kampas <martin.kampas@jolla.com> - 3.1+git5
 - Use 0555 permissions for /sys. Fixes JB#53484
 
