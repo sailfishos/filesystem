@@ -96,7 +96,7 @@ cat %{SOURCE1} | grep -v "^#" | grep -v "^$" | while read loc ; do
     fi
     # If the locale is not official and not special, skip it
     if [ -z "$special" ]; then
-        egrep -q "[[:space:]]${locale%%_*}[[:space:]]" \
+        grep -q -E "[[:space:]]${locale%%_*}[[:space:]]" \
            %{buildroot}/iso_639.tab || continue
     fi
     echo "%lang(${locale})	/usr/share/locale/${loc}" >> $RPM_BUILD_DIR/filelist
