@@ -190,8 +190,9 @@ return 0
 
 
 %files -f filelist
+%exclude /documentation.list
 %defattr(0755,root,root,0755)
-/
+%dir %attr(555,root,root) /
 /bin
 %attr(700,root,root) /boot
 %attr(555,root,root) /afs
