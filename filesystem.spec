@@ -120,10 +120,10 @@ for i in man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x,0p,1p,3p}; do
    echo "/usr/share/man/$i" >>$RPM_BUILD_DIR/filelist
 done
 
-%if "%_arch" == "aarch64"
+%ifarch aarch64
 # Install the ldconfig
 install -D -m644 %SOURCE4 %{buildroot}/%{_sysconfdir}/ld.so.conf.d/aarch64.conf
-%endif ## aarch64
+%endif
 
 mkdir -p %{buildroot}/usr/share/filesystem
 #find all dirs in the buildroot owned by filesystem and store them
@@ -169,14 +169,14 @@ end
 posix.mkdir("/var")
 posix.symlink("../run", "/var/run")
 posix.symlink("../run/lock", "/var/lock")
-%if "%_arch" == "aarch64"
+%ifarch aarch64
 os.execute('ldconfig')
 %endif
 return 0
 
 %posttrans
 #we need to restorecon on some dirs created in %pretrans or by other packages
-#no selnux in Sailfish OS base installation
+#no selinux in Sailfish OS base installation
 #restorecon /var 2>/dev/null >/dev/null || :
 #restorecon /var/run 2>/dev/null >/dev/null || :
 #restorecon /var/lock 2>/dev/null >/dev/null || :
@@ -313,7 +313,7 @@ return 0
 %attr(775,root,mail) /var/spool/mail
 %attr(1777,root,root) /var/tmp
 /var/yp
-%if "%_arch" == "aarch64"
+%ifarch aarch64
 %config %{_sysconfdir}/ld.so.conf.d/aarch64.conf
 %dir %{_sysconfdir}/ld.so.conf.d
-%endif ## aarch64
+%endif
