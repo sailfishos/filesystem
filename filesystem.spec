@@ -27,11 +27,11 @@ the directories owned by the filesystem package. This can be used
 during the build process instead of calling rpm -ql filesystem.
 
 %prep
-rm -f $RPM_BUILD_DIR/filelist
 
 %build
 
 %install
+rm -f $RPM_BUILD_DIR/filelist
 rm -rf %{buildroot}
 mkdir %{buildroot}
 install -p -c -m755 %SOURCE2 %{buildroot}/iso_639.sed
@@ -78,8 +78,10 @@ grep -v "^$" %{buildroot}/iso_639.tab | grep -v "^#" | while read a b c d ; do
     if [ "$locale" = "XX" ]; then
         locale=$b
     fi
-    echo "%lang(${locale})	/usr/share/locale/${locale}" >> $RPM_BUILD_DIR/filelist
+    echo "%lang(${locale}) /usr/share/locale/${locale}" >> $RPM_BUILD_DIR/filelist
+    mkdir -p -m 755 %{buildroot}/usr/share/locale/${locale}/LC_MESSAGES
     echo "%lang(${locale}) %ghost %config(missingok) /usr/share/man/${locale}" >>$RPM_BUILD_DIR/filelist
+    mkdir -p -m 755 %{buildroot}/usr/share/man/${locale}/man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x,0p,1p,3p}
 done
 cat %{SOURCE1} | grep -v "^#" | grep -v "^$" | while read loc ; do
     locale=$loc
@@ -96,11 +98,13 @@ cat %{SOURCE1} | grep -v "^#" | grep -v "^$" | while read loc ; do
     fi
     # If the locale is not official and not special, skip it
     if [ -z "$special" ]; then
-        egrep -q "[[:space:]]${locale%%_*}[[:space:]]" \
+        grep -q -E "[[:space:]]${locale%%_*}[[:space:]]" \
            %{buildroot}/iso_639.tab || continue
     fi
-    echo "%lang(${locale})	/usr/share/locale/${loc}" >> $RPM_BUILD_DIR/filelist
-    echo "%lang(${locale})  %ghost %config(missingok) /usr/share/man/${loc}" >> $RPM_BUILD_DIR/filelist
+    echo "%lang(${locale}) /usr/share/locale/${loc}" >> $RPM_BUILD_DIR/filelist
+    mkdir -p -m 755 %{buildroot}/usr/share/locale/${loc}/LC_MESSAGES
+    echo "%lang(${locale}) %ghost %config(missingok) /usr/share/man/${loc}" >> $RPM_BUILD_DIR/filelist
+    mkdir -p -m 755 %{buildroot}/usr/share/man/${loc}/man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x,0p,1p,3p}
 done
 
 rm -f %{buildroot}/iso_639.tab
@@ -108,22 +112,14 @@ rm -f %{buildroot}/iso_639.sed
 rm -f %{buildroot}/iso_3166.tab
 rm -f %{buildroot}/iso_3166.sed
 
-cat $RPM_BUILD_DIR/filelist | grep "locale" | while read a b ; do
-    mkdir -p -m 755 %{buildroot}/$b/LC_MESSAGES
-done
-
-cat $RPM_BUILD_DIR/filelist | grep "/share/man" | while read a b c d; do
-    mkdir -p -m 755 %{buildroot}/$d/man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x,0p,1p,3p}
-done
-
 for i in man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x,0p,1p,3p}; do
    echo "/usr/share/man/$i" >>$RPM_BUILD_DIR/filelist
 done
 
-%if "%_arch" == "aarch64"
+%ifarch aarch64
 # Install the ldconfig
 install -D -m644 %SOURCE4 %{buildroot}/%{_sysconfdir}/ld.so.conf.d/aarch64.conf
-%endif ## aarch64
+%endif
 
 mkdir -p %{buildroot}/usr/share/filesystem
 #find all dirs in the buildroot owned by filesystem and store them
@@ -169,7 +165,7 @@ end
 posix.mkdir("/var")
 posix.symlink("../run", "/var/run")
 posix.symlink("../run/lock", "/var/lock")
-%if "%_arch" == "aarch64"
+%ifarch aarch64
 os.execute('ldconfig')
 %endif
 return 0
@@ -194,8 +190,9 @@ return 0
 
 
 %files -f filelist
+%exclude /documentation.list
 %defattr(0755,root,root,0755)
-/
+%dir %attr(555,root,root) /
 /bin
 %attr(700,root,root) /boot
 %attr(555,root,root) /afs
@@ -230,7 +227,7 @@ return 0
 /usr/bin
 /usr/games
 /usr/include
-/usr/lib
+%dir /usr/lib
 %dir /usr/lib/sysimage
 %dir /usr/lib/locale
 %dir /usr/lib/modules
@@ -238,12 +235,16 @@ return 0
 %dir /usr/lib/debug/.dwz
 %ghost /usr/lib/debug/bin
 %ghost /usr/lib/debug/lib
+%if "%{_lib}" != "lib"
 %ghost /usr/lib/debug/%{_lib}
-%ghost /usr/lib/debug/usr
+%endif
+%ghost %dir /usr/lib/debug/usr
 %ghost /usr/lib/debug/usr/bin
 %ghost /usr/lib/debug/usr/sbin
 %ghost /usr/lib/debug/usr/lib
+%if "%{_lib}" != "lib"
 %ghost /usr/lib/debug/usr/%{_lib}
+%endif
 %ghost /usr/lib/debug/usr/.dwz
 %ghost /usr/lib/debug/sbin
 %attr(555,root,root) /usr/lib/games
@@ -313,7 +314,7 @@ return 0
 %attr(775,root,mail) /var/spool/mail
 %attr(1777,root,root) /var/tmp
 /var/yp
-%if "%_arch" == "aarch64"
+%ifarch aarch64
 %config %{_sysconfdir}/ld.so.conf.d/aarch64.conf
 %dir %{_sysconfdir}/ld.so.conf.d
-%endif ## aarch64
+%endif
