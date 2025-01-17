@@ -227,7 +227,7 @@ return 0
 /usr/bin
 /usr/games
 /usr/include
-/usr/lib
+%dir /usr/lib
 %dir /usr/lib/sysimage
 %dir /usr/lib/locale
 %dir /usr/lib/modules
@@ -235,12 +235,16 @@ return 0
 %dir /usr/lib/debug/.dwz
 %ghost /usr/lib/debug/bin
 %ghost /usr/lib/debug/lib
+%if "%{_lib}" != "lib"
 %ghost /usr/lib/debug/%{_lib}
-%ghost /usr/lib/debug/usr
+%endif
+%ghost %dir /usr/lib/debug/usr
 %ghost /usr/lib/debug/usr/bin
 %ghost /usr/lib/debug/usr/sbin
 %ghost /usr/lib/debug/usr/lib
+%if "%{_lib}" != "lib"
 %ghost /usr/lib/debug/usr/%{_lib}
+%endif
 %ghost /usr/lib/debug/usr/.dwz
 %ghost /usr/lib/debug/sbin
 %attr(555,root,root) /usr/lib/games
