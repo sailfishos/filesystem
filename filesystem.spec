@@ -78,8 +78,10 @@ grep -v "^$" %{buildroot}/iso_639.tab | grep -v "^#" | while read a b c d ; do
     if [ "$locale" = "XX" ]; then
         locale=$b
     fi
-    echo "%lang(${locale})	/usr/share/locale/${locale}" >> $RPM_BUILD_DIR/filelist
+    echo "%lang(${locale}) /usr/share/locale/${locale}" >> $RPM_BUILD_DIR/filelist
+    mkdir -p -m 755 %{buildroot}/usr/share/locale/${locale}/LC_MESSAGES
     echo "%lang(${locale}) %ghost %config(missingok) /usr/share/man/${locale}" >>$RPM_BUILD_DIR/filelist
+    mkdir -p -m 755 %{buildroot}/usr/share/man/${locale}/man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x,0p,1p,3p}
 done
 cat %{SOURCE1} | grep -v "^#" | grep -v "^$" | while read loc ; do
     locale=$loc
@@ -99,22 +101,16 @@ cat %{SOURCE1} | grep -v "^#" | grep -v "^$" | while read loc ; do
         egrep -q "[[:space:]]${locale%%_*}[[:space:]]" \
            %{buildroot}/iso_639.tab || continue
     fi
-    echo "%lang(${locale})	/usr/share/locale/${loc}" >> $RPM_BUILD_DIR/filelist
-    echo "%lang(${locale})  %ghost %config(missingok) /usr/share/man/${loc}" >> $RPM_BUILD_DIR/filelist
+    echo "%lang(${locale}) /usr/share/locale/${loc}" >> $RPM_BUILD_DIR/filelist
+    mkdir -p -m 755 %{buildroot}/usr/share/locale/${loc}/LC_MESSAGES
+    echo "%lang(${locale}) %ghost %config(missingok) /usr/share/man/${loc}" >> $RPM_BUILD_DIR/filelist
+    mkdir -p -m 755 %{buildroot}/usr/share/man/${loc}/man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x,0p,1p,3p}
 done
 
 rm -f %{buildroot}/iso_639.tab
 rm -f %{buildroot}/iso_639.sed
 rm -f %{buildroot}/iso_3166.tab
 rm -f %{buildroot}/iso_3166.sed
-
-cat $RPM_BUILD_DIR/filelist | grep "locale" | while read a b ; do
-    mkdir -p -m 755 %{buildroot}/$b/LC_MESSAGES
-done
-
-cat $RPM_BUILD_DIR/filelist | grep "/share/man" | while read a b c d; do
-    mkdir -p -m 755 %{buildroot}/$d/man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x,0p,1p,3p}
-done
 
 for i in man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x,0p,1p,3p}; do
    echo "/usr/share/man/$i" >>$RPM_BUILD_DIR/filelist
