@@ -1,3 +1,10 @@
+* Fri Mar 07 2025 Matti Viljanen <matti.viljanen@jolla.com> - 3.16+git2
+- Don't package empty file. Fixes JB#63056
+- Don't package files multiple times
+- Always clear filelist when building
+- Don't use obsolete egrep
+- Fix bogus date, extra token warnings and a typo
+
 * Wed Feb 02 2022 Matti Kosola <matti.kosola@jolla.com> - 3.16+git1
 - Sync with Fedora 3.16 version. Fixes JB#57301
 
@@ -13,7 +20,7 @@
 * Thu Mar 12 2020 Matti Kosola <matti.kosola@jolla.com> - 3.1+git2
 - Remove /var/spool/uucp and uucp user/group usage. Fixes JB#49323
 
-* Tue Jan 16 2020 Franz-Josef Haider <franz.haider@jollamobile.com> - 3.1+git1
+* Thu Jan 16 2020 Franz-Josef Haider <franz.haider@jollamobile.com> - 3.1+git1
 - [filesystem] make sure boot is only readable by root. JB#46551
 
 * Tue Jul 24 2012 Marko Saukko <marko.saukko@jollamobile.com> - 3.1

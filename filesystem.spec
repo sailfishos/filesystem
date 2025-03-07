@@ -1,6 +1,6 @@
 Summary: The basic directory layout for a Linux system
 Name: filesystem
-Version: 3.16+git1
+Version: 3.16+git2
 Release: 1
 License: Public Domain
 URL: https://pagure.io/filesystem
@@ -27,17 +27,17 @@ the directories owned by the filesystem package. This can be used
 during the build process instead of calling rpm -ql filesystem.
 
 %prep
-rm -f $RPM_BUILD_DIR/filelist
 
 %build
 
 %install
+rm -f $RPM_BUILD_DIR/filelist
 rm -rf %{buildroot}
 mkdir %{buildroot}
+pushd %{buildroot}
+
 install -p -c -m755 %SOURCE2 %{buildroot}/iso_639.sed
 install -p -c -m755 %SOURCE3 %{buildroot}/iso_3166.sed
-
-cd %{buildroot}
 
 mkdir -p afs boot dev \
         bin lib sbin \
@@ -96,7 +96,7 @@ cat %{SOURCE1} | grep -v "^#" | grep -v "^$" | while read loc ; do
     fi
     # If the locale is not official and not special, skip it
     if [ -z "$special" ]; then
-        egrep -q "[[:space:]]${locale%%_*}[[:space:]]" \
+        grep -q -E "[[:space:]]${locale%%_*}[[:space:]]" \
            %{buildroot}/iso_639.tab || continue
     fi
     echo "%lang(${locale})	/usr/share/locale/${loc}" >> $RPM_BUILD_DIR/filelist
@@ -120,15 +120,17 @@ for i in man{1,2,3,4,5,6,7,8,9,n,1x,2x,3x,4x,5x,6x,7x,8x,9x,0p,1p,3p}; do
    echo "/usr/share/man/$i" >>$RPM_BUILD_DIR/filelist
 done
 
-%if "%_arch" == "aarch64"
+%ifarch aarch64
 # Install the ldconfig
 install -D -m644 %SOURCE4 %{buildroot}/%{_sysconfdir}/ld.so.conf.d/aarch64.conf
-%endif ## aarch64
+%endif
 
 mkdir -p %{buildroot}/usr/share/filesystem
 #find all dirs in the buildroot owned by filesystem and store them
 find %{buildroot} -mindepth 0 | sed -e 's|%{buildroot}|/|' -e 's|//|/|' \
  | LC_ALL=C sort | grep -v filesystem >%{buildroot}%{_datadir}/filesystem/paths
+
+popd
 
 %pretrans -p <lua>
 --# If we are running in pretrans in a fresh root, there is no /usr and
@@ -169,14 +171,14 @@ end
 posix.mkdir("/var")
 posix.symlink("../run", "/var/run")
 posix.symlink("../run/lock", "/var/lock")
-%if "%_arch" == "aarch64"
+%ifarch aarch64
 os.execute('ldconfig')
 %endif
 return 0
 
 %posttrans
 #we need to restorecon on some dirs created in %pretrans or by other packages
-#no selnux in Sailfish OS base installation
+#no selinux in Sailfish OS base installation
 #restorecon /var 2>/dev/null >/dev/null || :
 #restorecon /var/run 2>/dev/null >/dev/null || :
 #restorecon /var/lock 2>/dev/null >/dev/null || :
@@ -195,7 +197,7 @@ return 0
 
 %files -f filelist
 %defattr(0755,root,root,0755)
-/
+%dir %attr(555,root,root) /
 /bin
 %attr(700,root,root) /boot
 %attr(555,root,root) /afs
@@ -230,7 +232,7 @@ return 0
 /usr/bin
 /usr/games
 /usr/include
-/usr/lib
+%dir /usr/lib
 %dir /usr/lib/sysimage
 %dir /usr/lib/locale
 %dir /usr/lib/modules
@@ -238,12 +240,16 @@ return 0
 %dir /usr/lib/debug/.dwz
 %ghost /usr/lib/debug/bin
 %ghost /usr/lib/debug/lib
+%if "%{_lib}" != "lib"
 %ghost /usr/lib/debug/%{_lib}
-%ghost /usr/lib/debug/usr
+%endif
+%ghost %dir /usr/lib/debug/usr
 %ghost /usr/lib/debug/usr/bin
 %ghost /usr/lib/debug/usr/sbin
 %ghost /usr/lib/debug/usr/lib
+%if "%{_lib}" != "lib"
 %ghost /usr/lib/debug/usr/%{_lib}
+%endif
 %ghost /usr/lib/debug/usr/.dwz
 %ghost /usr/lib/debug/sbin
 %attr(555,root,root) /usr/lib/games
@@ -313,7 +319,7 @@ return 0
 %attr(775,root,mail) /var/spool/mail
 %attr(1777,root,root) /var/tmp
 /var/yp
-%if "%_arch" == "aarch64"
+%ifarch aarch64
 %config %{_sysconfdir}/ld.so.conf.d/aarch64.conf
 %dir %{_sysconfdir}/ld.so.conf.d
-%endif ## aarch64
+%endif
