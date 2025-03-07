@@ -27,11 +27,11 @@ the directories owned by the filesystem package. This can be used
 during the build process instead of calling rpm -ql filesystem.
 
 %prep
-rm -f $RPM_BUILD_DIR/filelist
 
 %build
 
 %install
+rm -f $RPM_BUILD_DIR/filelist
 rm -rf %{buildroot}
 mkdir %{buildroot}
 install -p -c -m755 %SOURCE2 %{buildroot}/iso_639.sed
