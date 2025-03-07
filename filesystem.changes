@@ -1,3 +1,10 @@
+* Fri Mar 07 2025 Matti Viljanen <matti.viljanen@jolla.com> - 3.16+git2
+- Don't package empty file. Fixes JB#63056
+- Don't package files multiple times
+- Always clear filelist when building
+- Don't use obsolete egrep
+- Fix bogus date, extra token warnings and a typo
+
 * Wed Feb 02 2022 Matti Kosola <matti.kosola@jolla.com> - 3.16+git1
 - Sync with Fedora 3.16 version. Fixes JB#57301
 

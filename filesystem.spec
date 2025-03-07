@@ -1,6 +1,6 @@
 Summary: The basic directory layout for a Linux system
 Name: filesystem
-Version: 3.16+git1
+Version: 3.16+git2
 Release: 1
 License: Public Domain
 URL: https://pagure.io/filesystem
@@ -34,10 +34,10 @@ during the build process instead of calling rpm -ql filesystem.
 rm -f $RPM_BUILD_DIR/filelist
 rm -rf %{buildroot}
 mkdir %{buildroot}
+pushd %{buildroot}
+
 install -p -c -m755 %SOURCE2 %{buildroot}/iso_639.sed
 install -p -c -m755 %SOURCE3 %{buildroot}/iso_3166.sed
-
-cd %{buildroot}
 
 mkdir -p afs boot dev \
         bin lib sbin \
@@ -129,6 +129,8 @@ mkdir -p %{buildroot}/usr/share/filesystem
 #find all dirs in the buildroot owned by filesystem and store them
 find %{buildroot} -mindepth 0 | sed -e 's|%{buildroot}|/|' -e 's|//|/|' \
  | LC_ALL=C sort | grep -v filesystem >%{buildroot}%{_datadir}/filesystem/paths
+
+popd
 
 %pretrans -p <lua>
 --# If we are running in pretrans in a fresh root, there is no /usr and
