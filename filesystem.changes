@@ -1,3 +1,6 @@
+* Sat Mar 08 2025 Matti Lehtimäki <matti.lehtimaki@jolla.com> - 3.16+git3
+- Fix permissions of root. JB#63056
+
 * Fri Mar 07 2025 Matti Viljanen <matti.viljanen@jolla.com> - 3.16+git2
 - Don't package empty file. Fixes JB#63056
 - Don't package files multiple times
