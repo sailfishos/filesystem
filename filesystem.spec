@@ -1,6 +1,6 @@
 Summary: The basic directory layout for a Linux system
 Name: filesystem
-Version: 3.16+git2
+Version: 3.16+git3
 Release: 1
 License: Public Domain
 URL: https://pagure.io/filesystem
@@ -197,7 +197,7 @@ return 0
 
 %files -f filelist
 %defattr(0755,root,root,0755)
-%dir %attr(555,root,root) /
+%dir /
 /bin
 %attr(700,root,root) /boot
 %attr(555,root,root) /afs
