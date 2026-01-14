@@ -1,3 +1,6 @@
+* Wed Jan 14 2026 Pekka Vuorela <pekka.vuorela@jolla.com> - 3.16+git5
+- Fix .spec version. JB#60371
+
 * Wed Jan 14 2026 Pekka Vuorela <pekka.vuorela@jolla.com> - 3.16+git4
 - Properly avoid %posttrans. JB#60371
 

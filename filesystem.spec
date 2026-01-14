@@ -1,6 +1,6 @@
 Summary: The basic directory layout for a Linux system
 Name: filesystem
-Version: 3.16+git3
+Version: 3.16+git5
 Release: 1
 License: Public Domain
 URL: https://pagure.io/filesystem
