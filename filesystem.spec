@@ -176,6 +176,7 @@ os.execute('ldconfig')
 %endif
 return 0
 
+%if 0
 %posttrans
 #we need to restorecon on some dirs created in %pretrans or by other packages
 #no selinux in Sailfish OS base installation
@@ -188,6 +189,7 @@ return 0
 #restorecon /dev 2>/dev/null >/dev/null || :
 #restorecon /media 2>/dev/null >/dev/null || :
 #restorecon /afs 2>/dev/null >/dev/null || :
+%endif
 
 %files content
 %dir %{_datadir}/filesystem

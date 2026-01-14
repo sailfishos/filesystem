@@ -1,3 +1,6 @@
+* Wed Jan 14 2026 Pekka Vuorela <pekka.vuorela@jolla.com> - 3.16+git4
+- Properly avoid %posttrans. JB#60371
+
 * Sat Mar 08 2025 Matti Lehtimäki <matti.lehtimaki@jolla.com> - 3.16+git3
 - Fix permissions of root. JB#63056
 
